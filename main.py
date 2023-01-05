@@ -25,6 +25,10 @@ def escoger_conversacion(conversaciones_personales):
 
     return conversaciones_personales[num_conversacion_escogida]["name"]
 
+def filtrar_mensajes_conversacion(lista_mensajes):
+    """ Devuelve una lista con los mensajes de la conversación, descartando mensajes de tipo "service"."""
+    return [mensaje for mensaje in lista_mensajes if mensaje["type"] == "message"]
+
 # Lectura de argumentos por línea de comandos
 parser = argparse.ArgumentParser()
 parser.add_argument("archivo", help="Archivo a leer, el result.json generado por Telegram.")
@@ -41,11 +45,22 @@ if args.chat:
 else:
     nombre_conversacion = escoger_conversacion(datos_conversaciones)
 
-conversacion = None
-for conv in datos_conversaciones:
-    if conv["name"] == nombre_conversacion:
-        conversacion = conv
+lista_mensajes = None
+for conversacion in datos_conversaciones:
+    if conversacion["name"] == nombre_conversacion:
+        lista_mensajes = conversacion["messages"]
         break
 
-print(conversacion)
+lista_mensajes = filtrar_mensajes_conversacion(lista_mensajes)
+# Se considera A como el usuario que ejecuta el script y B al otro usuario de la conversación
+mensajes_a = 0
+mensajes_b = 0
 
+for mensaje in lista_mensajes:
+    if mensaje["from"] == nombre_conversacion:
+        mensajes_b += 1
+    else:
+        mensajes_a += 1
+
+print(f"El usuario A ha enviado {mensajes_a} mensajes y el usuario B ({nombre_conversacion}) {mensajes_b}.")
+    
