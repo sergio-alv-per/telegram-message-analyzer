@@ -1,9 +1,17 @@
-# Telegram Message Analyzer
+# Telegram Message Analyzer 💬
 
-Este repositorio contiene un programa escrito en Python para el análisis de conversaciones en Telegram. Utilizando esta herramienta podrás obtener algunos datos como el porcentaje de mensajes que ha enviado cada participante, el número de palabras que han escrito, etc.
+Este repositorio contiene un programa escrito en Python para el análisis de conversaciones en Telegram. Utilizando esta herramienta podrás obtener diversos datos y gráficas sobre una conversación.
 
-## Características
-_En construcción_
+## Datos generados
+- Recuento de mensajes escritos en total y por persona.
+- Recuento de archivos multimedia enviados en total y por persona.
+- Recuento de mensajes enviados en cada día.
+- Recuento de mensajes enviados en cada día del año.
+- Recuento de mensajes enviados en cada día de la semana.
+- Recuento de mensajes enviados en cada minuto del día.
+- Frecuencia de uso de palabras.
+- Palabras más utilizadas por una persona respecto a la otra.
+- Tiempo total de notas de voz enviadas.
 
 ## Instalación
 _En construcción_
