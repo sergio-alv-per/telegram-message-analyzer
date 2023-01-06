@@ -1,4 +1,5 @@
 import argparse
+from collections import Counter, defaultdict
 import json
 
 def leer_archivo_exportado(nombre_archivo):
@@ -52,15 +53,11 @@ for conversacion in datos_conversaciones:
         break
 
 lista_mensajes = filtrar_mensajes_conversacion(lista_mensajes)
-# Se considera A como el usuario que ejecuta el script y B al otro usuario de la conversación
-mensajes_a = 0
-mensajes_b = 0
+
+# Estructura que alamacenará los datos estadísiticos de la conversación
+informacion_mensajes = defaultdict(lambda: Counter())
 
 for mensaje in lista_mensajes:
-    if mensaje["from"] == nombre_conversacion:
-        mensajes_b += 1
-    else:
-        mensajes_a += 1
+    informacion_mensajes[mensaje["from"]]["num_mensajes"] += 1
 
-print(f"El usuario A ha enviado {mensajes_a} mensajes y el usuario B ({nombre_conversacion}) {mensajes_b}.")
-    
+print(informacion_mensajes)    
