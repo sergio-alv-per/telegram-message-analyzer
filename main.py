@@ -1,5 +1,6 @@
 import argparse
 from collections import Counter, defaultdict
+from datetime import datetime
 import json
 
 def leer_archivo_exportado(nombre_archivo):
@@ -30,6 +31,11 @@ def filtrar_mensajes_conversacion(lista_mensajes):
     """ Devuelve una lista con los mensajes de la conversación, descartando mensajes de tipo "service"."""
     return [mensaje for mensaje in lista_mensajes if mensaje["type"] == "message"]
 
+def fecha_a_dia_semana(fecha):
+    """ Devuelve el día de la semana correspondiente a la fecha dada."""
+    dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    return dias_semana[datetime.strptime(fecha, "%Y-%m-%d").weekday()]
+
 # Lectura de argumentos por línea de comandos
 parser = argparse.ArgumentParser()
 parser.add_argument("archivo", help="Archivo a leer, el result.json generado por Telegram.")
@@ -54,10 +60,17 @@ for conversacion in datos_conversaciones:
 
 lista_mensajes = filtrar_mensajes_conversacion(lista_mensajes)
 
-# Estructura que alamacenará los datos estadísticos de la conversación
+# Estructuras que alamacenarán los datos estadísticos de la conversación
 informacion_mensajes = defaultdict(lambda: Counter())
+series_tiempo = defaultdict(lambda: defaultdict(lambda: Counter()))
 
 for mensaje in lista_mensajes:
+    series_tiempo[mensaje["from"]]["mensajes_por_dia"][mensaje["date"].split("T")[0]] +=1
+    series_tiempo[mensaje["from"]]["mensajes_por_hora"][mensaje["date"].split("T")[1].split(":")[0]] +=1
+    series_tiempo[mensaje["from"]]["mensajes_por_minuto"][":".join(mensaje["date"].split("T")[1].split(":")[:2])] +=1
+    series_tiempo[mensaje["from"]]["mensajes_por_dia_año"]["-".join(mensaje["date"].split("T")[0].split("-")[1:])] +=1
+    series_tiempo[mensaje["from"]]["mensajes_por_dia_semana"][fecha_a_dia_semana(mensaje["date"].split("T")[0])] +=1
+
     informacion_mensajes[mensaje["from"]]["num_mensajes"] += 1
 
     if "photo" in mensaje:
