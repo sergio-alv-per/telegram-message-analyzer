@@ -65,25 +65,26 @@ informacion_mensajes = defaultdict(lambda: Counter())
 series_tiempo = defaultdict(lambda: defaultdict(lambda: Counter()))
 
 for mensaje in lista_mensajes:
-    series_tiempo[mensaje["from"]]["mensajes_por_dia"][mensaje["date"].split("T")[0]] +=1
-    series_tiempo[mensaje["from"]]["mensajes_por_hora"][mensaje["date"].split("T")[1].split(":")[0]] +=1
-    series_tiempo[mensaje["from"]]["mensajes_por_minuto"][":".join(mensaje["date"].split("T")[1].split(":")[:2])] +=1
-    series_tiempo[mensaje["from"]]["mensajes_por_dia_año"]["-".join(mensaje["date"].split("T")[0].split("-")[1:])] +=1
-    series_tiempo[mensaje["from"]]["mensajes_por_dia_semana"][fecha_a_dia_semana(mensaje["date"].split("T")[0])] +=1
+    autor_mensaje = mensaje["from"]
+    series_tiempo[autor_mensaje]["mensajes_por_dia"][mensaje["date"].split("T")[0]] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_hora"][mensaje["date"].split("T")[1].split(":")[0]] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_minuto"][":".join(mensaje["date"].split("T")[1].split(":")[:2])] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_dia_año"]["-".join(mensaje["date"].split("T")[0].split("-")[1:])] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_dia_semana"][fecha_a_dia_semana(mensaje["date"].split("T")[0])] +=1
 
-    informacion_mensajes[mensaje["from"]]["num_mensajes"] += 1
+    informacion_mensajes[autor_mensaje]["num_mensajes"] += 1
 
     if "photo" in mensaje:
-        informacion_mensajes[mensaje["from"]]["num_fotos"] += 1
+        informacion_mensajes[autor_mensaje]["num_fotos"] += 1
     
     if "media_type" in mensaje:
         if mensaje["media_type"] == "video_file":
-            informacion_mensajes[mensaje["from"]]["num_videos"] += 1
+            informacion_mensajes[autor_mensaje]["num_videos"] += 1
         elif mensaje["media_type"] == "voice_message":
-            informacion_mensajes[mensaje["from"]]["num_notas_voz"] += 1
-            informacion_mensajes[mensaje["from"]]["duracion_notas_voz"] += mensaje["duration_seconds"]
+            informacion_mensajes[autor_mensaje]["num_notas_voz"] += 1
+            informacion_mensajes[autor_mensaje]["duracion_notas_voz"] += mensaje["duration_seconds"]
         elif mensaje["media_type"] == "video_message":
-            informacion_mensajes[mensaje["from"]]["num_notas_video"] += 1
-            informacion_mensajes[mensaje["from"]]["duracion_videos_video"] += mensaje["duration_seconds"]
+            informacion_mensajes[autor_mensaje]["num_notas_video"] += 1
+            informacion_mensajes[autor_mensaje]["duracion_videos_video"] += mensaje["duration_seconds"]
         elif mensaje["media_type"] == "sticker":
-            informacion_mensajes[mensaje["from"]]["num_stickers"] += 1
+            informacion_mensajes[autor_mensaje]["num_stickers"] += 1
