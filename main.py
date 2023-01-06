@@ -54,10 +54,23 @@ for conversacion in datos_conversaciones:
 
 lista_mensajes = filtrar_mensajes_conversacion(lista_mensajes)
 
-# Estructura que alamacenará los datos estadísiticos de la conversación
+# Estructura que alamacenará los datos estadísticos de la conversación
 informacion_mensajes = defaultdict(lambda: Counter())
 
 for mensaje in lista_mensajes:
     informacion_mensajes[mensaje["from"]]["num_mensajes"] += 1
 
-print(informacion_mensajes)    
+    if "photo" in mensaje:
+        informacion_mensajes[mensaje["from"]]["num_fotos"] += 1
+    
+    if "media_type" in mensaje:
+        if mensaje["media_type"] == "video_file":
+            informacion_mensajes[mensaje["from"]]["num_videos"] += 1
+        elif mensaje["media_type"] == "voice_message":
+            informacion_mensajes[mensaje["from"]]["num_notas_voz"] += 1
+            informacion_mensajes[mensaje["from"]]["duracion_notas_voz"] += mensaje["duration_seconds"]
+        elif mensaje["media_type"] == "video_message":
+            informacion_mensajes[mensaje["from"]]["num_notas_video"] += 1
+            informacion_mensajes[mensaje["from"]]["duracion_videos_video"] += mensaje["duration_seconds"]
+        elif mensaje["media_type"] == "sticker":
+            informacion_mensajes[mensaje["from"]]["num_stickers"] += 1
