@@ -63,9 +63,11 @@ lista_mensajes = filtrar_mensajes_conversacion(lista_mensajes)
 # Estructuras que alamacenarán los datos estadísticos de la conversación
 informacion_mensajes = defaultdict(lambda: Counter())
 series_tiempo = defaultdict(lambda: defaultdict(lambda: Counter()))
+frecuencia_palabras = defaultdict(lambda: Counter())
 
 for mensaje in lista_mensajes:
     autor_mensaje = mensaje["from"]
+
     series_tiempo[autor_mensaje]["mensajes_por_dia"][mensaje["date"].split("T")[0]] +=1
     series_tiempo[autor_mensaje]["mensajes_por_hora"][mensaje["date"].split("T")[1].split(":")[0]] +=1
     series_tiempo[autor_mensaje]["mensajes_por_minuto"][":".join(mensaje["date"].split("T")[1].split(":")[:2])] +=1
@@ -88,3 +90,25 @@ for mensaje in lista_mensajes:
             informacion_mensajes[autor_mensaje]["duracion_videos_video"] += mensaje["duration_seconds"]
         elif mensaje["media_type"] == "sticker":
             informacion_mensajes[autor_mensaje]["num_stickers"] += 1
+
+    # El texto puede ser un string o una lista de strings y diccionarios
+    # Los diccionarios representan texto de tipo especial (negrita, cursiva, links, etc.)
+    # Solo se procesa el texto especial de tipo negrita y cursiva, el resto se descarta
+    texto = ""
+    tipos_texto_aceptados = {"italic", "bold"}
+
+    if type(mensaje["text"]) == str:
+        texto = mensaje["text"]
+    else:
+        for t in mensaje["text"]:
+            if type(t) == str:
+                texto += t
+            else:
+                if t["type"] in tipos_texto_aceptados:
+                    texto += t["text"]
+
+    # Se pasa el texto a minúsculas para evitar que se cuenten palabras repetidas
+    palabras = texto.lower().split()
+
+    for palabra in palabras:
+        frecuencia_palabras[autor_mensaje][palabra] += 1
