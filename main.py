@@ -3,10 +3,56 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from preprocesado import preprocesado_archivo_exportado
 
-def fecha_a_dia_semana(fecha):
-    """ Devuelve el día de la semana correspondiente a la fecha dada."""
+def fecha(momento):
+    """ Devuelve la fecha correspondiente al momento dado.
+        Un momento es una cadena de texto con el formato: "2020-01-01T20:30:40"
+
+        >>> fecha("2020-01-01T20:30:40")
+        "2020-01-01"
+    """
+    return momento.split("T")[0]
+
+def hora(momento):
+    """ Devuelve la hora correspondiente al momento dado.
+        
+        >>> fecha("2020-01-01T20:30:40")
+        "20:30:40"
+    """
+    return momento.split("T")[1]
+
+def hora_del_dia(momento):
+    """ Devuelve la hora del día correspondiente al momento dado.
+        
+        >>> fecha("2020-01-01T20:30:40")
+        "20"
+    """
+    return momento.split("T")[1].split(":")[0]
+
+def hora_y_minuto(momento):
+    """ Devuelve la hora y el minuto correspondientes al momento dado.
+    
+        >>> hora_y_minuto("2020-01-01T20:30:40")
+        "20:30"
+    """
+    return ":".join(hora(momento).split(":")[:2])
+
+def dia_del_año(momento):
+    """ Devuelve el día del año correspondiente al momento dado.
+    
+        >>> dia_del_año("2020-01-01T20:30:40")
+        "01-01"
+    """
+
+    return "-".join(fecha(momento).split("-")[1:])
+
+def dia_de_semana(momento):
+    """ Devuelve el día de la semana correspondiente al momento dado.
+    
+        >>> dia_de_semana("2020-01-01T20:30:40")
+        "miércoles"
+    """
     dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
-    return dias_semana[datetime.strptime(fecha, "%Y-%m-%d").weekday()]
+    return dias_semana[datetime.strptime(fecha(momento), "%Y-%m-%d").weekday()]
 
 # Lectura de argumentos por línea de comandos
 parser = argparse.ArgumentParser()
@@ -25,12 +71,13 @@ texto_mensajes = defaultdict(lambda: [])
 
 for mensaje in lista_mensajes:
     autor_mensaje = mensaje["from"]
+    momento_mensaje = mensaje["date"]
 
-    series_tiempo[autor_mensaje]["mensajes_por_dia"][mensaje["date"].split("T")[0]] +=1
-    series_tiempo[autor_mensaje]["mensajes_por_hora"][mensaje["date"].split("T")[1].split(":")[0]] +=1
-    series_tiempo[autor_mensaje]["mensajes_por_minuto"][":".join(mensaje["date"].split("T")[1].split(":")[:2])] +=1
-    series_tiempo[autor_mensaje]["mensajes_por_dia_año"]["-".join(mensaje["date"].split("T")[0].split("-")[1:])] +=1
-    series_tiempo[autor_mensaje]["mensajes_por_dia_semana"][fecha_a_dia_semana(mensaje["date"].split("T")[0])] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_dia"][fecha(momento_mensaje)] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_hora"][hora_del_dia(momento_mensaje)] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_minuto"][hora_y_minuto(momento_mensaje)] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_dia_año"][dia_del_año(momento_mensaje)] +=1
+    series_tiempo[autor_mensaje]["mensajes_por_dia_semana"][dia_de_semana(momento_mensaje)] +=1
 
     informacion_mensajes[autor_mensaje]["num_mensajes"] += 1
 
