@@ -3,3 +3,6 @@ __pycache__
 # Archivos exportados de Telegram
 resultados
 result.json
+
+# VSCode
+.vscode
