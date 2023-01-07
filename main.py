@@ -1,35 +1,7 @@
 import argparse
 from collections import Counter, defaultdict
 from datetime import datetime
-import json
-
-def leer_archivo_exportado(nombre_archivo):
-    """ Lee el archivo JSON generado por Telegram y devuelve un diccionario con los datos."""
-    with open(nombre_archivo, encoding="UTF-8") as archivo:
-        datos_coversaciones = json.load(archivo)
-        return datos_coversaciones
-
-def filtrar_conversaciones_personales(datos_conversaciones):
-    """ Devuelve una lista con las conversaciones personales, es decir, excluye los grupos y otros tipos de conversaciones."""
-    conversaciones_personales = []
-    for conversacion in datos_conversaciones["chats"]["list"]:
-        if conversacion["type"] == "personal_chat":
-            conversaciones_personales.append(conversacion)
-    return conversaciones_personales
-
-def escoger_conversacion(conversaciones_personales):
-    """ Muestra las conversaciones disponibles y devuelve el nombre de la conversación escogida."""
-    print("Conversaciones: ")
-    for i, conversacion in enumerate(conversaciones_personales):
-        print(f"({i}) {conversacion['name']}")
-    
-    num_conversacion_escogida = int(input("Elige una conversación: "))
-
-    return conversaciones_personales[num_conversacion_escogida]["name"]
-
-def filtrar_mensajes_conversacion(lista_mensajes):
-    """ Devuelve una lista con los mensajes de la conversación, descartando mensajes de tipo "service"."""
-    return [mensaje for mensaje in lista_mensajes if mensaje["type"] == "message"]
+from preprocesado import preprocesado_archivo_exportado
 
 def fecha_a_dia_semana(fecha):
     """ Devuelve el día de la semana correspondiente a la fecha dada."""
@@ -43,22 +15,7 @@ parser.add_argument("-c", "--chat", help="Nombre de contacto correspondiente a l
 
 args = parser.parse_args()
 
-# Lectura del archivo JSON, quitando las conversaciones que no son personales
-datos_conversaciones = filtrar_conversaciones_personales(leer_archivo_exportado(args.archivo))
-
-# Escoger una conversación y obtener sus datos
-if args.chat:
-    nombre_conversacion = args.chat
-else:
-    nombre_conversacion = escoger_conversacion(datos_conversaciones)
-
-lista_mensajes = None
-for conversacion in datos_conversaciones:
-    if conversacion["name"] == nombre_conversacion:
-        lista_mensajes = conversacion["messages"]
-        break
-
-lista_mensajes = filtrar_mensajes_conversacion(lista_mensajes)
+lista_mensajes = preprocesado_archivo_exportado(args.archivo, args.chat)
 
 # Estructuras que alamacenarán los datos estadísticos de la conversación
 informacion_mensajes = defaultdict(lambda: Counter())
