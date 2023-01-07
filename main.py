@@ -21,6 +21,7 @@ lista_mensajes = preprocesado_archivo_exportado(args.archivo, args.chat)
 informacion_mensajes = defaultdict(lambda: Counter())
 series_tiempo = defaultdict(lambda: defaultdict(lambda: Counter()))
 frecuencia_palabras = defaultdict(lambda: Counter())
+texto_mensajes = defaultdict(lambda: [])
 
 for mensaje in lista_mensajes:
     autor_mensaje = mensaje["from"]
@@ -64,8 +65,14 @@ for mensaje in lista_mensajes:
                 if t["type"] in tipos_texto_aceptados:
                     texto += t["text"]
 
-    # Se pasa el texto a minúsculas para evitar que se cuenten palabras repetidas
-    palabras = texto.lower().split()
+    # Si el mensaje no tenía texto (por ejemplo, era un sticker), se ignora
+    if texto:
+        # Se pasa el texto a minúsculas para "nomalizarlo"
+        texto = texto.lower()
 
-    for palabra in palabras:
-        frecuencia_palabras[autor_mensaje][palabra] += 1
+        texto_mensajes[autor_mensaje].append(texto)
+
+        palabras = texto.split()
+
+        for palabra in palabras:
+            frecuencia_palabras[autor_mensaje][palabra] += 1
