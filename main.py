@@ -87,7 +87,7 @@ for mensaje in lista_mensajes:
             informacion_mensajes[autor_mensaje]["duracion_notas_voz"] += mensaje["duration_seconds"]
         elif mensaje["media_type"] == "video_message":
             informacion_mensajes[autor_mensaje]["num_notas_video"] += 1
-            informacion_mensajes[autor_mensaje]["duracion_videos_video"] += mensaje["duration_seconds"]
+            informacion_mensajes[autor_mensaje]["duracion_notas_video"] += mensaje["duration_seconds"]
         elif mensaje["media_type"] == "sticker":
             informacion_mensajes[autor_mensaje]["num_stickers"] += 1
 
