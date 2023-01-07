@@ -1,7 +1,6 @@
 import argparse
 from preprocesado import preprocesado_archivo_exportado
-from procesado import obtener_datos_conversacion
-
+from ProcesadorMensajes import ProcesadorMensajes
 
 
 # Lectura de argumentos por línea de comandos
@@ -11,7 +10,7 @@ parser.add_argument("-c", "--chat", help="Nombre de contacto correspondiente a l
 
 args = parser.parse_args()
 
-lista_mensajes = preprocesado_archivo_exportado(args.archivo, args.chat)
+lista_mensajes = preprocesado_archivo_exportado(args.archivo, nombre_conversacion=args.chat)
 
-datos_conversacion = obtener_datos_conversacion(lista_mensajes)
+datos_conversacion = ProcesadorMensajes(lista_mensajes).procesar_mensajes()
 
