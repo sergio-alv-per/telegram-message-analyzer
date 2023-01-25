@@ -1,4 +1,5 @@
 import math
+import pandas as pd
 
 def analizar_datos_conversacion(datos_conversacion):
     """ Analiza los datos obtenidos de la conversación para obtener nuevas métricas,
@@ -17,13 +18,14 @@ def analisis_tf_idf_palabras(frecuencia_palabras):
     for emisor in frecuencia_palabras:
         todas_palabras.update(frecuencia_palabras[emisor].index.tolist())
     
-    datos_tf_idf_palabras = {}
+    datos_tf_idf_palabras = pd.DataFrame(index=sorted(list(todas_palabras)))
 
     for emisor in frecuencia_palabras:
-        datos_tf_idf_palabras[emisor] = {}
+        datos_tf_idf_palabras[emisor] = 0
         for palabra in todas_palabras:
-            datos_tf_idf_palabras[emisor][palabra] = tf_idf(palabra, emisor, frecuencia_palabras)
+            datos_tf_idf_palabras.loc[palabra, emisor] = tf_idf(palabra, emisor, frecuencia_palabras)
     
+    datos_tf_idf_palabras["Diferencia"] = datos_tf_idf_palabras.iloc[:, 0] - datos_tf_idf_palabras.iloc[:, 1]
     return datos_tf_idf_palabras
 
 def tf_idf(palabra, emisor, frecuencia_palabras):
