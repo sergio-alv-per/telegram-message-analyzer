@@ -1,5 +1,6 @@
 from collections import Counter, defaultdict
 import pandas as pd
+import string
 
 class TextoMensajes():
     """ Clase para almacenar la frecuencia de uso de las palabras y los textos de los mensajes."""
@@ -9,7 +10,7 @@ class TextoMensajes():
         self.texto_mensajes = defaultdict(lambda: [])
     
     def quitar_caracteres_especiales(self, texto):
-        return texto.translate({ord(i): None for i in '¡!¿?.,;:"\n\'()[]{}'})
+        return texto.translate({ord(i): None for i in string.punctuation})
     
     def obtener_texto_mensaje(self, mensaje):
         """ Procesa el campo "text" de un mensaje. Este campo puede ser un string o una lista de strings y diccionarios.
