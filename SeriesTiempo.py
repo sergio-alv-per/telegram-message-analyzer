@@ -51,7 +51,7 @@ class SeriesTiempo():
             series[autor]["mensajes_por_hora"] = pd.Series(self.series_tiempo[autor]["mensajes_por_hora"])
             series[autor]["mensajes_por_minuto"] = pd.Series(self.series_tiempo[autor]["mensajes_por_minuto"])
             series[autor]["mensajes_por_dia_año"] = pd.Series(self.series_tiempo[autor]["mensajes_por_dia_año"])
-            series[autor]["mensajes_por_dia_semana"] = pd.DataFrame.from_dict(self.series_tiempo[autor]["mensajes_por_dia_semana"], orient="index", columns=["Numero_mensajes"])
+            series[autor]["mensajes_por_dia_semana"] = pd.Series(self.series_tiempo[autor]["mensajes_por_dia_semana"])
         
         return series
 
