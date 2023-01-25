@@ -2,6 +2,7 @@ import argparse
 from preprocesado import preprocesado_archivo_exportado
 from ProcesadorMensajes import ProcesadorMensajes
 from analisis import analizar_datos_conversacion
+from exportado import exportar_datos_generados
 
 
 
@@ -15,4 +16,7 @@ lista_mensajes = preprocesado_archivo_exportado(args.archivo)
 
 datos_conversacion = ProcesadorMensajes(lista_mensajes).procesar_mensajes()
 
-analisis = analizar_datos_conversacion(datos_conversacion)
+analisis_conversacion = analizar_datos_conversacion(datos_conversacion)
+
+exportar_datos_generados(datos_conversacion, analisis_conversacion)
+
