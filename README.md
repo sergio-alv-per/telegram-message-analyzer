@@ -13,9 +13,9 @@ Programa escrito en Python para el análisis de conversaciones en Telegram. Util
 - Frecuencia de uso de palabras.
 - Palabras más utilizadas por una persona respecto a la otra.
 - Tiempo total de notas de voz y notas de vídeo enviadas.
-- Análisis de sentimientos de los mensajes enviados.
 
 ### Visualizaciones de los datos 📊
+- Comparación entre el número de mensajes, fotos, vídeos, etc. enviados por cada persona.
 _En construcción_
 
 ## Instalación
