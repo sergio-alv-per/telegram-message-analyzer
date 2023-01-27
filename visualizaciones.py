@@ -13,6 +13,9 @@ def generar_visualizaciones(datos_conversacion, analisis_conversacion, directori
         os.makedirs(directorio)
     
     generar_grafica_recuentos_mensajes(datos_conversacion["recuentos_mensajes"], directorio)
+    generar_grafica_mensajes_dia_semana(datos_conversacion["series_tiempo"], directorio)
+
+    plt.show()
 
 def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     """ Se genera una gráfica que representa, para cada valor del que se ha hecho recuento,
@@ -27,7 +30,7 @@ def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     fig.set_facecolor(COLOR_FONDO)
     
     emisor_1, emisor_2 = recuentos_mensajes.keys()
-    fig.suptitle(f"Recuentos: {emisor_1} vs {emisor_2}")
+    fig.suptitle(f"Recuentos: {emisor_1} y {emisor_2}")
 
     titulos = ["Mensajes", "Imágenes", "Vídeos", "Stickers", "Notas de voz", "Duración de notas de voz", "Noas de vídeo", "Duración de notas de vídeo"]
     atributos = ["num_mensajes", "num_fotos", "num_videos", "num_stickers", "num_notas_voz", "duracion_notas_voz", "num_notas_video", "duracion_notas_video"]
@@ -59,4 +62,27 @@ def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
     # Etiquetas en las barras
     ax.text(0, -1, f"{recuentos_mensajes[emisor_1][atributo]} ({100*proporcion_1:.2f}%)")
     ax.text(1, -1, f"{recuentos_mensajes[emisor_2][atributo]} ({100*proporcion_2:.2f}%)", ha="right")
-    ax.text(1.01, 0, total, ha="left", va="center")    
+    ax.text(1.01, 0, total, ha="left", va="center")
+
+def generar_grafica_mensajes_dia_semana(series_tiempo, directorio):
+    """ Genera un gráfico de barras con el número de mensajes enviados en cada día de la semana. """
+    fig, ax = plt.subplots(figsize=(6, 3))
+
+    fig.set_facecolor(COLOR_FONDO)
+    ax.set_facecolor(COLOR_FONDO)
+
+    emisor_1, emisor_2 = series_tiempo.keys() 
+    ax.set_title(f"Mensajes por día de la semana: {emisor_1} y {emisor_2}")
+
+    # Ocultar los ejes
+    ax.spines[:].set_visible(False)
+
+    emisor_1, emisor_2 = series_tiempo.keys()
+
+    # Generar las barras
+    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    ax.bar(dias_semana, series_tiempo[emisor_1]["mensajes_por_dia_semana"].values, color=COLOR_BARRAS_EMISOR_1)
+    ax.bar(dias_semana, series_tiempo[emisor_2]["mensajes_por_dia_semana"].values, bottom=series_tiempo[emisor_1]["mensajes_por_dia_semana"].values, color=COLOR_BARRAS_EMISOR_2)
+
+    archivo = os.path.join(directorio, "mensajes_dia_semana.png")
+    fig.savefig(archivo, dpi=150)
