@@ -1,11 +1,17 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import os
 
 COLOR_FONDO = "#F5F0F6"
 COLOR_BARRAS_EMISOR_1 = "#385F71"
 COLOR_BARRAS_EMISOR_2 = "#D7B377"
 
 def generar_visualizaciones(datos_conversacion, analisis_conversacion, directorio="visualizaciones"):
+
+    # Crear el directorio si no existe
+    if not os.path.exists(directorio):
+        os.makedirs(directorio)
+    
     generar_grafica_recuentos_mensajes(datos_conversacion["recuentos_mensajes"], directorio)
 
 def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
@@ -27,7 +33,7 @@ def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
     # Etiquetas en las barras
     ax.text(0, -1, f"{recuentos_mensajes[emisor_1][atributo]} ({100*proporcion_1:.2f}%)")
     ax.text(1, -1, f"{recuentos_mensajes[emisor_2][atributo]} ({100*proporcion_2:.2f}%)", ha="right")
-    ax.text(1.005, 0, total, ha="left", va="center")    
+    ax.text(1.01, 0, total, ha="left", va="center")    
 
 def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     """ Se genera una gráfica que representa, para cada valor del que se ha hecho recuento,
@@ -37,7 +43,7 @@ def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     fig, (ax_mensajes, ax_fotos,
     ax_videos, ax_stickers, ax_numero_notas_voz,
     ax_duracion_notas_voz, ax_numero_notas_video,
-    ax_duracion_notas_video) = plt.subplots(8, 1)
+    ax_duracion_notas_video) = plt.subplots(8, 1, figsize=(6, 7))
 
     # Incrementar el espacio entre los subgráficos
     fig.subplots_adjust(hspace=2)
@@ -70,5 +76,5 @@ def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     ax_duracion_notas_video.set_title("Duración de notas de vídeo")
     generar_subplot_barras_horizontales(ax_duracion_notas_video, recuentos_mensajes, "duracion_notas_video")
 
-    # TODO sustituir por exportar la gráfica a un archivo
-    plt.show()
+    archivo = os.path.join(directorio, "recuentos.png")
+    fig.savefig(archivo, dpi=150)
