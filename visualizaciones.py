@@ -42,7 +42,7 @@ def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     emisor_1, emisor_2 = recuentos_mensajes.keys()
     fig.suptitle(f"Recuentos: {emisor_1} y {emisor_2}")
 
-    titulos = ["Mensajes", "Imágenes", "Vídeos", "Stickers", "Notas de voz", "Duración de notas de voz", "Noats de vídeo", "Duración de notas de vídeo"]
+    titulos = ["Mensajes", "Imágenes", "Vídeos", "Stickers", "Notas de voz", "Duración de notas de voz", "Notas de vídeo", "Duración de notas de vídeo"]
     atributos = ["num_mensajes", "num_fotos", "num_videos", "num_stickers", "num_notas_voz", "duracion_notas_voz", "num_notas_video", "duracion_notas_video"]
 
     # Generar las 8 gráficas de barras
