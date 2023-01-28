@@ -1,6 +1,8 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import os
+import pandas as pd
+import locale
 
 COLOR_FONDO = "#F5F0F6"
 COLOR_EMISOR_1 = "#385F71"
@@ -14,15 +16,15 @@ def generar_visualizaciones(datos_conversacion, analisis_conversacion, directori
     if not os.path.exists(directorio):
         os.makedirs(directorio)
     
+    # Establecer el idioma para que las fechas se muestren en español
+    locale.setlocale(locale.LC_ALL,"es_ES.UTF-8")
+    
     generar_grafica_recuentos_mensajes(datos_conversacion["recuentos_mensajes"], directorio)
     generar_grafica_mensajes_dia(datos_conversacion["series_tiempo"], directorio)
     generar_grafica_mensajes_dia_año(datos_conversacion["series_tiempo"], directorio)
     generar_grafica_mensajes_dia_semana(datos_conversacion["series_tiempo"], directorio)
     generar_grafica_mensajes_hora(datos_conversacion["series_tiempo"], directorio)
     generar_grafica_mensajes_minuto(datos_conversacion["series_tiempo"], directorio)
-
-
-    plt.show()
 
 def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     """ Se genera una gráfica que representa, para cada valor del que se ha hecho recuento,
@@ -98,12 +100,10 @@ def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
     """ Genera un gráfico con una línea marcando el número de mensajes total
         enviados por ambos emisores de media los últimos numero_dias días.
     """
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(9, 4))
 
     fig.set_facecolor(COLOR_FONDO)
     ax.set_facecolor(COLOR_FONDO)
-
-    fig.subplots_adjust(bottom=0.23)
 
     emisor_1, emisor_2 = series_tiempo.keys() 
     ax.set_title(f"Mensajes por día (media {numero_dias} días): {emisor_1} y {emisor_2}")
@@ -112,13 +112,37 @@ def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
     media_movimiento = mensajes_totales.rolling(numero_dias).mean()
     ax.plot(media_movimiento, color=COLOR_TOTALES)
 
-    ax.tick_params(axis='x', rotation=45)
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 7)))
+    ax.xaxis.set_minor_locator(mdates.MonthLocator(bymonth=(4, 10)))
+
+    ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
 
     archivo = os.path.join(directorio, "mensajes_dia.png")
     fig.savefig(archivo, dpi=150)
 
 def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
-    pass
+    """Genera un gráfico con una línea marcando el número de mensajes total en un día del año."""
+    fig, ax = plt.subplots(figsize=(9, 4))
+
+    fig.set_facecolor(COLOR_FONDO)
+    ax.set_facecolor(COLOR_FONDO)
+
+    #fig.subplots_adjust(bottom=0.23)
+
+    emisor_1, emisor_2 = series_tiempo.keys() 
+    ax.set_title(f"Mensajes por día del año: {emisor_1} y {emisor_2}")
+
+    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia_año"].add(series_tiempo[emisor_2]["mensajes_por_dia_año"], fill_value=0)
+    mensajes_totales.index = pd.to_datetime(mensajes_totales.index, format="%j")
+    ax.plot(mensajes_totales, color=COLOR_TOTALES)
+
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+    for label in ax.get_xticklabels(which='major'):
+        label.set(rotation=30, horizontalalignment='right')
+
+    archivo = os.path.join(directorio, "mensajes_dia_año.png")
+    fig.savefig(archivo, dpi=150)
 
 def generar_grafica_mensajes_hora(series_tiempo, directorio):
     pass
