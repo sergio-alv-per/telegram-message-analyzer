@@ -8,9 +8,10 @@ class TextoMensajes():
     def __init__(self):
         self.frecuencia_palabras = defaultdict(lambda: Counter())
         self.texto_mensajes = defaultdict(lambda: [])
+        self.tabla_caracteres_especiales = {ord(i): None for i in string.punctuation}
     
     def quitar_caracteres_especiales(self, texto):
-        return texto.translate({ord(i): None for i in string.punctuation})
+        return texto.translate(self.tabla_caracteres_especiales)
     
     def obtener_texto_mensaje(self, mensaje):
         """ Procesa el campo "text" de un mensaje. Este campo puede ser un string o una lista de strings y diccionarios.
