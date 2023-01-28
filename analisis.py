@@ -22,10 +22,14 @@ def analisis_tf_idf_palabras(frecuencia_palabras):
     
     datos_tf_idf_palabras = {}
 
+    total_palabras_emisor = {}
+    for emisor in frecuencia_palabras:
+        total_palabras_emisor[emisor] = frecuencia_palabras[emisor]["Frecuencia"].sum()
+
     for emisor in frecuencia_palabras:
         datos_tf_idf_palabras[emisor]  = []
         for palabra in todas_palabras_ordenadas:
-            datos_tf_idf_palabras[emisor].append(tf_idf(palabra, emisor, frecuencia_palabras))
+            datos_tf_idf_palabras[emisor].append(tf_idf(palabra, emisor, frecuencia_palabras, total_palabras_emisor))
     
     datos_tf_idf_palabras = pd.DataFrame(datos_tf_idf_palabras, index=todas_palabras_ordenadas)
     
@@ -35,16 +39,16 @@ def analisis_tf_idf_palabras(frecuencia_palabras):
     
     return datos_tf_idf_palabras
 
-def tf_idf(palabra, emisor, frecuencia_palabras):
-    return tf(palabra, emisor, frecuencia_palabras) * idf(palabra, frecuencia_palabras)
+def tf_idf(palabra, emisor, frecuencia_palabras, total_palabras_emisor):
+    return tf(palabra, emisor, frecuencia_palabras, total_palabras_emisor) * idf(palabra, frecuencia_palabras)
 
-def tf(palabra, emisor, frecuencia_palabras):
+def tf(palabra, emisor, frecuencia_palabras, total_palabras_emisor):
     try:
         numero_usos_de_palabra = frecuencia_palabras[emisor].at[palabra, "Frecuencia"]
     except KeyError:
         numero_usos_de_palabra = 0
     
-    numero_palabras_total_emisor = frecuencia_palabras[emisor]["Frecuencia"].sum()
+    numero_palabras_total_emisor = total_palabras_emisor[emisor]
     return numero_usos_de_palabra / numero_palabras_total_emisor
 
 def idf(palabra, frecuencia_palabras):
