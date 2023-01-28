@@ -62,7 +62,7 @@ def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
     proporcion_1 = recuentos_mensajes[emisor_1][atributo]/total
     proporcion_2 = recuentos_mensajes[emisor_2][atributo]/total
 
-    # Oclutar los ejes
+    # Ocultar los ejes
     ax.axis("off")
 
     # Representar las barras
