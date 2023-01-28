@@ -172,4 +172,29 @@ def generar_grafica_mensajes_hora(series_tiempo, directorio):
 
 
 def generar_grafica_mensajes_minuto(series_tiempo, directorio):
-    pass
+    """ Genera una línea con el número de mensajes enviados en cada minuto del día. """
+    fig, ax = plt.subplots(figsize=(12, 4))
+
+    fig.set_facecolor(COLOR_FONDO)
+    ax.set_facecolor(COLOR_FONDO)
+
+    emisor_1, emisor_2 = series_tiempo.keys() 
+    ax.set_title(f"Mensajes por minuto del día: {emisor_1} y {emisor_2}")
+
+    fig.subplots_adjust(right=0.99, left=0.05, bottom=0.125)
+    ax.autoscale(enable=True, axis='x', tight=True)
+
+    # Generar las barras
+    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_minuto"].add(series_tiempo[emisor_2]["mensajes_por_minuto"], fill_value=0)
+    mensajes_totales.index = pd.to_datetime(mensajes_totales.index, format="%H:%M:%S")
+    ax.plot(mensajes_totales, color=COLOR_TOTALES)
+
+    ax.xaxis.set_major_locator(mdates.HourLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=(0, 30)))
+
+    for label in ax.get_xticklabels(which='major'):
+        label.set(rotation=30, horizontalalignment='right')
+
+    archivo = os.path.join(directorio, "mensajes_minuto.png")
+    fig.savefig(archivo, dpi=150)
