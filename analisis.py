@@ -18,12 +18,16 @@ def analisis_tf_idf_palabras(frecuencia_palabras):
     for emisor in frecuencia_palabras:
         todas_palabras.update(frecuencia_palabras[emisor].index.tolist())
     
-    datos_tf_idf_palabras = pd.DataFrame(index=sorted(list(todas_palabras)))
+    todas_palabras_ordenadas = sorted(list(todas_palabras))
+    
+    datos_tf_idf_palabras = {}
 
     for emisor in frecuencia_palabras:
-        datos_tf_idf_palabras[emisor] = 0
-        for palabra in todas_palabras:
-            datos_tf_idf_palabras.loc[palabra, emisor] = tf_idf(palabra, emisor, frecuencia_palabras)
+        datos_tf_idf_palabras[emisor]  = []
+        for palabra in todas_palabras_ordenadas:
+            datos_tf_idf_palabras[emisor].append(tf_idf(palabra, emisor, frecuencia_palabras))
+    
+    datos_tf_idf_palabras = pd.DataFrame(datos_tf_idf_palabras, index=todas_palabras_ordenadas)
     
     datos_tf_idf_palabras["Diferencia"] = datos_tf_idf_palabras.iloc[:, 1] - datos_tf_idf_palabras.iloc[:, 0]
 
