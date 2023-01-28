@@ -25,6 +25,7 @@ def generar_visualizaciones(datos_conversacion, analisis_conversacion, directori
     generar_grafica_mensajes_dia_semana(datos_conversacion["series_tiempo"], directorio)
     generar_grafica_mensajes_hora(datos_conversacion["series_tiempo"], directorio)
     generar_grafica_mensajes_minuto(datos_conversacion["series_tiempo"], directorio)
+    generar_grafica_tf_idf(analisis_conversacion["tf_idf_palabras"], directorio)
 
 def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     """ Se genera una gráfica que representa, para cada valor del que se ha hecho recuento,
@@ -198,3 +199,45 @@ def generar_grafica_mensajes_minuto(series_tiempo, directorio):
 
     archivo = os.path.join(directorio, "mensajes_minuto.png")
     fig.savefig(archivo, dpi=150)
+
+def generar_grafica_tf_idf(tf_idf, directorio, num_por_emisor=5):
+    """ Genera un gráfico representando el TF-IDF de las palabras más utilizadas por cada emisor."""
+
+    tf_idf.sort_values("Diferencia", inplace=True)
+
+    minimos = tf_idf.iloc[:num_por_emisor].loc[:, "Diferencia"]
+    maximos = tf_idf.iloc[-num_por_emisor:].loc[:, "Diferencia"]
+
+    mas_relevantes = pd.concat([minimos, maximos])
+
+    fig, axs = plt.subplots(2*num_por_emisor, 1, figsize=(7, 6))
+
+    fig.subplots_adjust(right=0.8, left=0.2)
+
+    fig.set_facecolor(COLOR_FONDO)
+    
+    emisor_1, emisor_2 = tf_idf.columns[:2]
+    fig.suptitle(f"Palabras más utilizadas: {emisor_1} y {emisor_2}")
+
+    for i, ax in enumerate(axs):
+        ax.set_facecolor(COLOR_FONDO)
+        ax.set_xlim(-1.05, 1.05)
+        ax.axis("off")
+
+        if i < num_por_emisor:
+            lado = -1
+            direccion = "right"
+        else:
+            lado = 1
+            direccion = "left"
+
+        ax.text(lado*1.05, 1, str(mas_relevantes.index[i]), ha=direccion, va="center", fontsize=12, fontname="Segoe UI Emoji")
+
+        ax.hlines(1, -1, 1, color="black", linewidth=1)
+        ax.vlines(0, 0.7, 1.3, linestyles="dashed", color="black", linewidth=0.5)
+        ax.eventplot([mas_relevantes.iloc[i]], color=COLOR_TOTALES, linelength=0.3, linewidths=4)
+
+    archivo = os.path.join(directorio, "palabras.png")
+    fig.savefig(archivo, dpi=150)
+
+    
