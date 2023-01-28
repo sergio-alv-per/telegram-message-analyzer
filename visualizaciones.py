@@ -145,7 +145,31 @@ def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
     fig.savefig(archivo, dpi=150)
 
 def generar_grafica_mensajes_hora(series_tiempo, directorio):
-    pass
+    """ Genera un gráfico de barras con el número de mensajes enviados en cada hora del día. """
+    fig, ax = plt.subplots(figsize=(10, 4))
+
+    fig.set_facecolor(COLOR_FONDO)
+    ax.set_facecolor(COLOR_FONDO)
+
+    fig.subplots_adjust(right=1, left=0.08, bottom=0.125)
+
+    emisor_1, emisor_2 = series_tiempo.keys() 
+    ax.set_title(f"Mensajes por hora del día: {emisor_1} y {emisor_2}")
+
+    # Ocultar los ejes
+    ax.spines[:].set_visible(False)
+
+    # Generar las barras
+    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_hora"].add(series_tiempo[emisor_2]["mensajes_por_hora"], fill_value=0)
+    mensajes_totales.index = pd.to_datetime(mensajes_totales.index, format="%H").strftime("%H:%M")
+    ax.bar(mensajes_totales.index, mensajes_totales.values, color=COLOR_TOTALES)
+
+    for label in ax.get_xticklabels():
+        label.set(rotation=30, horizontalalignment='right')
+
+    archivo = os.path.join(directorio, "mensajes_hora.png")
+    fig.savefig(archivo, dpi=150)
+
 
 def generar_grafica_mensajes_minuto(series_tiempo, directorio):
     pass
