@@ -25,7 +25,10 @@ def analisis_tf_idf_palabras(frecuencia_palabras):
         for palabra in todas_palabras:
             datos_tf_idf_palabras.loc[palabra, emisor] = tf_idf(palabra, emisor, frecuencia_palabras)
     
-    datos_tf_idf_palabras["Diferencia"] = datos_tf_idf_palabras.iloc[:, 0] - datos_tf_idf_palabras.iloc[:, 1]
+    datos_tf_idf_palabras["Diferencia"] = datos_tf_idf_palabras.iloc[:, 1] - datos_tf_idf_palabras.iloc[:, 0]
+
+    datos_tf_idf_palabras = normalizar_columna_menos_uno_uno(datos_tf_idf_palabras, "Diferencia")
+    
     return datos_tf_idf_palabras
 
 def tf_idf(palabra, emisor, frecuencia_palabras):
@@ -44,3 +47,11 @@ def idf(palabra, frecuencia_palabras):
     num_conversaciones = len(frecuencia_palabras)
     num_conversaciones_donde_aparece_palabra = sum([1 for emisor in frecuencia_palabras if palabra in frecuencia_palabras[emisor].index])
     return math.log(num_conversaciones / num_conversaciones_donde_aparece_palabra)
+
+def normalizar_columna_menos_uno_uno(df, columna):
+    """ Normaliza los valores de una columna de un DataFrame entre -1 y 1.
+        Los valores negativos se normalizan entre -1 y 0, y los positivos entre 0 y 1.
+    """
+    df[columna] = (df[columna] - df[columna].min()) / (df[columna].max() - df[columna].min())
+    df[columna] = df[columna] * 2 - 1
+    return df
