@@ -1,12 +1,13 @@
 from collections import Counter, defaultdict
 
+
 class Recuentos():
     """Clase que contiene datos de la conversación en forma de recuentos
        (número de mensajes, número de fotos, etc.)."""
-    
+
     def __init__(self):
         self.recuentos_mensajes = defaultdict(lambda: Counter())
-    
+
     def añadir_mensaje(self, mensaje):
         autor_mensaje = mensaje["from"]
 
@@ -17,7 +18,7 @@ class Recuentos():
 
         if "photo" in mensaje:
             diccionario_recuentos["num_fotos"] += 1
-        
+
         if "media_type" in mensaje:
             if mensaje["media_type"] == "video_file":
                 diccionario_recuentos["num_videos"] += 1
@@ -29,8 +30,8 @@ class Recuentos():
             elif mensaje["media_type"] == "video_message":
                 diccionario_recuentos["num_notas_video"] += 1
                 diccionario_recuentos["duracion_notas_video"] += mensaje["duration_seconds"]
-    
+
     def obtener_recuentos(self):
         """ Devuelve un diccionario con los recuentos de cada participante."""
-            
+
         return self.recuentos_mensajes

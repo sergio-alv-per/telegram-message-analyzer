@@ -8,7 +8,8 @@ from visualizaciones import generar_visualizaciones
 
 # Lectura de argumentos por línea de comandos
 parser = argparse.ArgumentParser()
-parser.add_argument("archivo", help="Archivo que leer, el result.json generado por Telegram.")
+parser.add_argument(
+    "archivo", help="Archivo que leer, el result.json generado por Telegram.")
 
 args = parser.parse_args()
 
