@@ -1,6 +1,6 @@
 import argparse
 from preprocesado import preprocesado_archivo_exportado
-from ProcesadorMensajes import ProcesadorMensajes
+from procesado import procesar_mensajes
 from analisis import analizar_datos_conversacion
 from exportado import exportar_datos_generados
 from visualizaciones import generar_visualizaciones
@@ -17,7 +17,7 @@ print("Preprocesando...")
 lista_mensajes = preprocesado_archivo_exportado(args.archivo)
 
 print("Procesando...")
-datos_conversacion = ProcesadorMensajes(lista_mensajes).procesar_mensajes()
+datos_conversacion = procesar_mensajes(lista_mensajes)
 
 print("Analizando...")
 analisis_conversacion = analizar_datos_conversacion(datos_conversacion)
