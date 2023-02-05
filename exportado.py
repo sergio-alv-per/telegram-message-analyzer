@@ -3,6 +3,9 @@ import json
 
 
 def exportar_datos_generados(datos_conversacion, analisis_conversacion, nombre_directorio="resultados"):
+    """ Exporta los datos generados por el programa a archivos JSON y CSV,
+        en el directorio especificado.
+    """
 
     if not os.path.exists(nombre_directorio):
         os.mkdir(nombre_directorio)
@@ -22,25 +25,30 @@ def exportar_datos_conversacion(datos_conversacion, nombre_directorio):
 
 def exportar_recuentos_mensajes(recuentos_mensajes, nombre_directorio):
     for emisor, recuento in recuentos_mensajes.items():
-        with open(os.path.join(nombre_directorio, f"recuentos_mensajes_{emisor}.json"), "w", encoding="UTF-8") as archivo:
+        nombre_archivo = f"recuentos_mensajes_{emisor}.json"
+        ruta_archivo = os.path.join(nombre_directorio, nombre_archivo)
+        with open(ruta_archivo, "w", encoding="UTF-8") as archivo:
             json.dump(recuento, archivo, indent=4)
 
 
 def exportar_series_tiempo(series_tiempo, nombre_directorio):
     for emisor, series in series_tiempo.items():
         for nombre_serie, serie in series.items():
-            archivo = os.path.join(
-                nombre_directorio, f"series_tiempo_{nombre_serie}_{emisor}.csv")
-            serie.sort_index().to_csv(archivo, encoding="UTF-8", header=False)
+            nombre_archivo = f"series_tiempo_{nombre_serie}_{emisor}.csv"
+            ruta_archivo = os.path.join(nombre_directorio, nombre_archivo)
+            serie.sort_index().to_csv(ruta_archivo, encoding="UTF-8", header=False)
 
 
 def exportar_frecuencia_palabras(frecuencia_palabras, nombre_directorio):
     for emisor, frecuencias in frecuencia_palabras.items():
-        archivo = os.path.join(
-            nombre_directorio, f"frecuencia_palabras_{emisor}.csv")
-        frecuencias.sort_index().to_csv(archivo, encoding="UTF-8")
+        nombre_archivo = f"frecuencia_palabras_{emisor}.csv"
+        ruta_archivo = os.path.join(nombre_directorio, nombre_archivo)
+        frecuencias.sort_index().to_csv(ruta_archivo, encoding="UTF-8")
 
 
 def exportar_analisis_conversacion(analisis_conversacion, nombre_directorio):
-    archivo = os.path.join(nombre_directorio, "analisis_conversacion.csv")
-    analisis_conversacion["tf_idf_palabras"].to_csv(archivo, encoding="UTF-8")
+    for nombre_analsis, analisis in analisis_conversacion.items():
+        nombre_archivo = f"analisis_conversacion_{nombre_analsis}.csv"
+        ruta_archivo = os.path.join(nombre_directorio, nombre_archivo)
+
+        analisis.to_csv(ruta_archivo, encoding="UTF-8")
