@@ -44,54 +44,69 @@ def crear_directorio_si_no_existe(directorio):
 def establecer_idioma_es():
     locale.setlocale(locale.LC_ALL, "es_ES.UTF-8")
 
+
 def guardar_grafica(fig, nombre_archivo, directorio, dpi=150):
     archivo = os.path.join(directorio, nombre_archivo)
     fig.savefig(archivo, dpi=dpi)
     plt.close(fig)
 
-def configurar_grafica(tamaño, titulo, filas=1, columnas=1, color_fondo=COLOR_FONDO):
+
+def configuracion_inicial_figura(tamaño, titulo, filas=1, columnas=1, color_fondo=COLOR_FONDO):
+    """ Configura la figura y los ejes según los parámetros dados. """
+
     fig, ax = plt.subplots(nrows=filas, ncols=columnas, figsize=tamaño)
+
     fig.suptitle(titulo)
+
     fig.set_facecolor(color_fondo)
 
+    # Se colorea dependiendo de si se genera un solo eje o varios
     if filas == 1 and columnas == 1:
         ax.set_facecolor(color_fondo)
     else:
         for a in ax:
             a.set_facecolor(color_fondo)
-    
+
     return fig, ax
 
+
 def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
-    """ Se genera una gráfica que representa, para cada valor del que se ha hecho recuento,
-    la proporción del valor asociada a cada emisor."""
+    """ Se genera una gráfica que representa, para cada valor del que se ha
+        hecho recuento, la proporción del valor asociada a cada emisor.
+    """
 
     emisor_1, emisor_2 = recuentos_mensajes.keys()
 
-    fig, axs = configurar_grafica((6,7), f"Recuentos: {emisor_1} y {emisor_2}", filas=8)    
+    titulo = f"Recuentos: {emisor_1} y {emisor_2}"
 
-    # Generar los subgráficos para las 8 barras
-    fig, axs = plt.subplots(8, 1, figsize=(6, 7))
+    fig, axs = configuracion_inicial_figura((6, 7), titulo, filas=8)
 
-    # Incrementar el espacio entre los subgráficos
+    # Configuración adicional específica para la gráfica de recuentos
     fig.subplots_adjust(hspace=2)
 
-
-    titulos = ["Mensajes", "Imágenes", "Vídeos", "Stickers", "Notas de voz",
-               "Duración de notas de voz", "Notas de vídeo", "Duración de notas de vídeo"]
-    atributos = ["num_mensajes", "num_fotos", "num_videos", "num_stickers",
-                 "num_notas_voz", "duracion_notas_voz", "num_notas_video", "duracion_notas_video"]
-
-    # Generar las 8 gráficas de barras
-    for titulo, atributo, ax in zip(titulos, atributos, axs):
-        ax.set_title(titulo)
-        generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo)
+    generar_subgraficas_recuentos(axs, recuentos_mensajes)
 
     guardar_grafica(fig, "recuentos.png", directorio)
 
 
-def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
-    """ Genera un subplot de barras horizontales para un atributo de los mensajes. """
+def generar_subgraficas_recuentos(axs, recuentos_mensajes):
+    """ Genera las 8 subgráficas de la gráfica de recuentos. """
+    titulos_subgraficas = ["Mensajes", "Imágenes", "Vídeos", "Stickers", "Notas de voz",
+                           "Duración de notas de voz", "Notas de vídeo", "Duración de notas de vídeo"]
+    atributos_subgraficas = ["num_mensajes", "num_fotos", "num_videos", "num_stickers",
+                             "num_notas_voz", "duracion_notas_voz", "num_notas_video", "duracion_notas_video"]
+
+    for titulo, atributo, ax in zip(titulos_subgraficas, atributos_subgraficas, axs):
+        ax.set_title(titulo)
+        generar_subgrafica_barras_horizontales(
+            ax, recuentos_mensajes, atributo)
+
+
+def generar_subgrafica_barras_horizontales(ax, recuentos_mensajes, atributo):
+    """ Genera un subplot de barras horizontales para un cierto atributo,
+        representando la proporción de dicho atributo para cada emisor.
+    """
+
     emisor_1, emisor_2 = recuentos_mensajes.keys()
 
     total = recuentos_mensajes[emisor_1][atributo] + \
@@ -100,18 +115,26 @@ def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
     proporcion_1 = recuentos_mensajes[emisor_1][atributo]/total
     proporcion_2 = recuentos_mensajes[emisor_2][atributo]/total
 
-    # Ocultar los ejes
+    # Se ocultan los ejes ya que no aportan información relevante
     ax.axis("off")
 
-    # Representar las barras
     ax.barh(atributo, proporcion_1, color=COLOR_EMISOR_1)
     ax.barh(atributo, proporcion_2, left=proporcion_1, color=COLOR_EMISOR_2)
 
-    # Etiquetas en las barras
-    ax.text(
-        0, -1, f"{recuentos_mensajes[emisor_1][atributo]} ({100*proporcion_1:.2f}%)")
-    ax.text(
-        1, -1, f"{recuentos_mensajes[emisor_2][atributo]} ({100*proporcion_2:.2f}%)", ha="right")
+    # Etiquetas de la forma "1234 (25.00%)"
+    etiqueta_izquierda = f"{recuentos_mensajes[emisor_1][atributo]} ({100*proporcion_1:.2f}%)"
+    etiqueta_derecha = f"{recuentos_mensajes[emisor_2][atributo]} ({100*proporcion_2:.2f}%)"
+
+    añadir_etiquetas_subgrafica_barras_horizontales(ax, etiqueta_izquierda, etiqueta_derecha, total)
+
+
+def añadir_etiquetas_subgrafica_barras_horizontales(ax, izquierda, derecha, total):
+    """ Añade las etiquetas dadas como parámetros a la subgráfica de barras
+        horizontales de ax.
+    """
+
+    ax.text(0, -1, izquierda)
+    ax.text(1, -1, derecha, ha="right")
     ax.text(1.01, 0, total, ha="left", va="center")
 
 
@@ -120,7 +143,8 @@ def generar_grafica_mensajes_dia_semana(series_tiempo, directorio):
 
     emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig, ax = configurar_grafica((6, 3), f"Mensajes por día de la semana: {emisor_1} y {emisor_2}")
+    fig, ax = configuracion_inicial_figura(
+        (6, 3), f"Mensajes por día de la semana: {emisor_1} y {emisor_2}")
 
     # Ocultar los ejes
     ax.spines[:].set_visible(False)
@@ -141,7 +165,8 @@ def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
         enviados por ambos emisores de media los últimos numero_dias días.
     """
     emisor_1, emisor_2 = series_tiempo.keys()
-    fig, ax = configurar_grafica((9, 4), f"Mensajes por día (media {numero_dias} días): {emisor_1} y {emisor_2}")
+    fig, ax = configuracion_inicial_figura(
+        (9, 4), f"Mensajes por día (media {numero_dias} días): {emisor_1} y {emisor_2}")
 
     mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia"].add(
         series_tiempo[emisor_2]["mensajes_por_dia"], fill_value=0)
@@ -161,7 +186,8 @@ def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
     """Genera un gráfico con una línea marcando el número de mensajes total en un día del año."""
     emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig, ax = configurar_grafica((9, 4), f"Mensajes por día del año: {emisor_1} y {emisor_2}")
+    fig, ax = configuracion_inicial_figura(
+        (9, 4), f"Mensajes por día del año: {emisor_1} y {emisor_2}")
 
     mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia_año"].add(
         series_tiempo[emisor_2]["mensajes_por_dia_año"], fill_value=0)
@@ -179,10 +205,11 @@ def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
 
 def generar_grafica_mensajes_hora(series_tiempo, directorio):
     """ Genera un gráfico de barras con el número de mensajes enviados en cada hora del día. """
-    
+
     emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig, ax = configurar_grafica((10, 4), f"Mensajes por hora del día: {emisor_1} y {emisor_2}")
+    fig, ax = configuracion_inicial_figura(
+        (10, 4), f"Mensajes por hora del día: {emisor_1} y {emisor_2}")
 
     fig.subplots_adjust(right=1, left=0.08, bottom=0.125)
 
@@ -206,8 +233,9 @@ def generar_grafica_mensajes_minuto(series_tiempo, directorio):
     """ Genera una línea con el número de mensajes enviados en cada minuto del día. """
 
     emisor_1, emisor_2 = series_tiempo.keys()
-    
-    fig, ax = configurar_grafica((12, 4), f"Mensajes por minuto del día: {emisor_1} y {emisor_2}")
+
+    fig, ax = configuracion_inicial_figura(
+        (12, 4), f"Mensajes por minuto del día: {emisor_1} y {emisor_2}")
 
     fig.subplots_adjust(right=0.99, left=0.05, bottom=0.125)
     ax.autoscale(enable=True, axis='x', tight=True)
