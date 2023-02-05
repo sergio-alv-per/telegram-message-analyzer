@@ -22,7 +22,7 @@ Programa escrito en Python para el análisis de conversaciones en Telegram. Util
 
 ## 🧑‍💻 Instalación y uso
 1. Descargar el repositorio: `git clone https://github.com/sergio-alv-per/telegram-message-analyzer.git`
-2. Obtener un archivo JSON con los datos de la conversación que se quiere analizar.
+2. Obtener un archivo JSON con los datos de la conversación que se quiere analizar (explicado más abajo).
 3. Ejecutar `main.py`, especificando el archivo dado por Telegram. Por ejemplo: `python main.py result.json`
 
 ### 📃 Obtención de un archivo con los datos de conversación
@@ -36,4 +36,6 @@ Para obtener un archivo JSON procesable por el programa es necesario usar [Teleg
 ## ➕ Posibles mejoras
 - Análisis de sentimiento de los mensajes usando NLTK o Spacy.
 - Mejora del procesado del texto, actualmente el análisis es bastante limitado.
-- Mejora de los métodos de visualización de los resultados.
+- Unificar la fuente utilizada por matplotlib, solucionar problemas relacionados con emojis.
+- Mejora de los métodos de visualización de los resultados (p. ej. emojis utilizados o nubes de palabras).
+- Generar un `requirements.txt` para facilitar la instalación de las dependencias necesarias.
