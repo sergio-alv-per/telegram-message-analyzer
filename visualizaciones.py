@@ -324,6 +324,23 @@ def configurar_ejes_grafica_mensajes_minuto(ax):
 def generar_grafica_tf_idf(tf_idf, directorio, num_por_emisor=5):
     """ Genera un gráfico representando el TF-IDF de las palabras más utilizadas por cada emisor."""
 
+    mas_relevantes = obtener_palabras_mas_relevantes(tf_idf, num_por_emisor)
+
+    emisor_1, emisor_2 = tf_idf.columns[:2]
+
+    titulo = f"Palabras más utilizadas: {emisor_1} y {emisor_2}"
+
+    fig, axs = configuracion_inicial_figura((7, 6), titulo, filas=2*num_por_emisor)
+
+    fig.subplots_adjust(right=0.8, left=0.2)
+
+    generar_subgraficas_tf_idf_mas_relevantes(axs, mas_relevantes, num_por_emisor)
+
+    guardar_grafica(fig, "palabras.png", directorio)
+
+def obtener_palabras_mas_relevantes(tf_idf, num_por_emisor=5):
+    """ Obtiene las palabras más relevantes de cada emisor. """
+
     tf_idf.sort_values("Diferencia", inplace=True)
 
     minimos = tf_idf.iloc[:num_por_emisor].loc[:, "Diferencia"]
@@ -331,20 +348,19 @@ def generar_grafica_tf_idf(tf_idf, directorio, num_por_emisor=5):
 
     mas_relevantes = pd.concat([minimos, maximos])
 
-    fig, axs = plt.subplots(2*num_por_emisor, 1, figsize=(7, 6))
+    return mas_relevantes
 
-    fig.subplots_adjust(right=0.8, left=0.2)
-
-    fig.set_facecolor(COLOR_FONDO)
-
-    emisor_1, emisor_2 = tf_idf.columns[:2]
-    fig.suptitle(f"Palabras más utilizadas: {emisor_1} y {emisor_2}")
+def generar_subgraficas_tf_idf_mas_relevantes(axs, mas_relevantes, num_por_emisor):
+    """ Genera una subgráfica por cada palabra más relevante. La gráfica es una
+        línea horizontal, con un punto que se sitúa más a la izquierda o a la
+        derecha según el emisor que la utilice más.
+    """
 
     for i, ax in enumerate(axs):
-        ax.set_facecolor(COLOR_FONDO)
         ax.set_xlim(-1.05, 1.05)
         ax.axis("off")
 
+        # Se escoge el lado del que se muestra la palabra
         if i < num_por_emisor:
             lado = -1
             direccion = "right"
@@ -352,13 +368,17 @@ def generar_grafica_tf_idf(tf_idf, directorio, num_por_emisor=5):
             lado = 1
             direccion = "left"
 
+        # Palabra relevante. Se utilizia la fuente específica por si la palabra
+        # es un emoji.
         ax.text(lado*1.05, 1, str(mas_relevantes.index[i]), ha=direccion,
                 va="center", fontsize=12, fontname="Segoe UI Emoji")
 
+        # Línea horizontal principal
         ax.hlines(1, -1, 1, color="black", linewidth=1)
+
+        # Línea vertical en el medio
         ax.vlines(0, 0.7, 1.3, linestyles="dashed",
                   color="black", linewidth=0.5)
-        ax.eventplot([mas_relevantes.iloc[i]],
-                     color=COLOR_TOTALES, linelength=0.3, linewidths=4)
 
-    guardar_grafica(fig, "palabras.png", directorio)
+        # Se situa el punto en la gráfica
+        ax.scatter(mas_relevantes.iloc[i], 1, color=COLOR_TOTALES, zorder=3)
