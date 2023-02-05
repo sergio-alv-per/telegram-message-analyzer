@@ -139,94 +139,142 @@ def añadir_etiquetas_subgrafica_barras_horizontales(ax, izquierda, derecha, tot
 
 
 def generar_grafica_mensajes_dia_semana(series_tiempo, directorio):
-    """ Genera un gráfico de barras con el número de mensajes enviados en cada día de la semana. """
+    """ Genera un gráfico de barras con el número de mensajes enviados en cada
+        día de la semana.
+    """
 
     emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig, ax = configuracion_inicial_figura(
-        (6, 3), f"Mensajes por día de la semana: {emisor_1} y {emisor_2}")
+    titulo = f"Mensajes por día de la semana: {emisor_1} y {emisor_2}"
 
-    # Ocultar los ejes
+    fig, ax = configuracion_inicial_figura((6, 3), titulo)
+
+    # Se ocultan las líneas pero se mantienen las marcas de los ejes
     ax.spines[:].set_visible(False)
 
-    # Generar las barras
     dias_semana = ["Lunes", "Martes", "Miércoles",
                    "Jueves", "Viernes", "Sábado", "Domingo"]
-    ax.bar(dias_semana, series_tiempo[emisor_1]
-           ["mensajes_por_dia_semana"].values, color=COLOR_EMISOR_1)
-    ax.bar(dias_semana, series_tiempo[emisor_2]["mensajes_por_dia_semana"].values,
-           bottom=series_tiempo[emisor_1]["mensajes_por_dia_semana"].values, color=COLOR_EMISOR_2)
+
+    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia_semana"].add(
+        series_tiempo[emisor_2]["mensajes_por_dia_semana"], fill_value=0)
+
+    ax.bar(dias_semana, mensajes_totales, color=COLOR_TOTALES)
 
     guardar_grafica(fig, "mensajes_dia_semana.png", directorio)
 
 
-def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
-    """ Genera un gráfico con una línea marcando el número de mensajes total
-        enviados por ambos emisores de media los últimos numero_dias días.
+def configurar_ejes_grafica_mensajes_dia(ax):
+    """ Configura los ejes de la gráfica, se muestran marcas grandes cada 6
+        meses y pequeñas cada 3 meses.
     """
-    emisor_1, emisor_2 = series_tiempo.keys()
-    fig, ax = configuracion_inicial_figura(
-        (9, 4), f"Mensajes por día (media {numero_dias} días): {emisor_1} y {emisor_2}")
+    marcas_bianuales = mdates.MonthLocator(bymonth=(1, 7))
+    marcas_trimestrales = mdates.MonthLocator(bymonth=(4, 10))
 
-    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia"].add(
-        series_tiempo[emisor_2]["mensajes_por_dia"], fill_value=0)
-    media_movimiento = mensajes_totales.rolling(numero_dias).mean()
-    ax.plot(media_movimiento, color=COLOR_TOTALES)
-
-    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 7)))
-    ax.xaxis.set_minor_locator(mdates.MonthLocator(bymonth=(4, 10)))
+    ax.xaxis.set_major_locator(marcas_bianuales)
+    ax.xaxis.set_minor_locator(marcas_trimestrales)
 
     ax.xaxis.set_major_formatter(
         mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
 
+
+def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
+    """ Genera un gráfico representando la media móvil de los mensajes enviados
+        por día. La amplitude de la media móvil está dada por el parámetro
+        numero_dias.
+    """
+
+    emisor_1, emisor_2 = series_tiempo.keys()
+
+    titulo = f"Mensajes por día (media móvil {numero_dias} días): {emisor_1} y {emisor_2}"
+
+    fig, ax = configuracion_inicial_figura((9, 4), titulo)
+
+    configurar_ejes_grafica_mensajes_dia(ax)
+
+    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia"].add(
+        series_tiempo[emisor_2]["mensajes_por_dia"], fill_value=0)
+
+    media_movil = mensajes_totales.rolling(numero_dias).mean()
+
+    ax.plot(media_movil, color=COLOR_TOTALES)
+
     guardar_grafica(fig, "mensajes_dia.png", directorio)
 
 
-def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
-    """Genera un gráfico con una línea marcando el número de mensajes total en un día del año."""
-    emisor_1, emisor_2 = series_tiempo.keys()
-
-    fig, ax = configuracion_inicial_figura(
-        (9, 4), f"Mensajes por día del año: {emisor_1} y {emisor_2}")
-
-    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia_año"].add(
-        series_tiempo[emisor_2]["mensajes_por_dia_año"], fill_value=0)
-    mensajes_totales.index = pd.to_datetime(
-        mensajes_totales.index, format="%j")
-    ax.plot(mensajes_totales, color=COLOR_TOTALES)
+def configurar_marcas_ejes_grafica_mensajes_dia_año(ax):
+    """ Configura los ejes de la gráfica, se muestran marcas todos los meses.
+        Además se rotan las etiquetas para que no se solapen.
+    """
 
     ax.xaxis.set_major_locator(mdates.MonthLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+
     for label in ax.get_xticklabels(which='major'):
         label.set(rotation=30, horizontalalignment='right')
+
+
+def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
+    """Genera un gráfico representando el número de mensajes enviados por día
+       del año.
+    """
+
+    emisor_1, emisor_2 = series_tiempo.keys()
+
+    titulo = f"Mensajes por día del año: {emisor_1} y {emisor_2}"
+
+    fig, ax = configuracion_inicial_figura((9, 4), titulo)
+
+    configurar_marcas_ejes_grafica_mensajes_dia_año(ax)
+
+    mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia_año"].add(
+        series_tiempo[emisor_2]["mensajes_por_dia_año"], fill_value=0)
+
+    # Se transforma de día del año (1-365) a fecha (objeto datetime) para que
+    # matplotlib pueda representar las etiquetas correctamente.
+    mensajes_totales.index = pd.to_datetime(
+        mensajes_totales.index, format="%j")
+
+    ax.plot(mensajes_totales, color=COLOR_TOTALES)
 
     guardar_grafica(fig, "mensajes_dia_año.png", directorio)
 
 
 def generar_grafica_mensajes_hora(series_tiempo, directorio):
-    """ Genera un gráfico de barras con el número de mensajes enviados en cada hora del día. """
+    """ Genera un gráfico de barras con el número de mensajes enviados en cada
+        hora del día.
+    """
 
     emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig, ax = configuracion_inicial_figura(
-        (10, 4), f"Mensajes por hora del día: {emisor_1} y {emisor_2}")
+    titulo = f"Mensajes por hora del día: {emisor_1} y {emisor_2}"
 
+    fig, ax = configuracion_inicial_figura((10, 4), titulo)
+
+    configurar_ejes_grafica_mensajes_hora(ax)
+
+    # Configuración adicional de la figura (márgenes)
     fig.subplots_adjust(right=1, left=0.08, bottom=0.125)
 
     # Ocultar los ejes
     ax.spines[:].set_visible(False)
 
-    # Generar las barras
     mensajes_totales = series_tiempo[emisor_1]["mensajes_por_hora"].add(
         series_tiempo[emisor_2]["mensajes_por_hora"], fill_value=0)
+
+    # Se transforma de hora del día (0-23) a hora (objeto datetime) para que
+    # matplotlib pueda representar las etiquetas correctamente.
     mensajes_totales.index = pd.to_datetime(
         mensajes_totales.index, format="%H").strftime("%H:%M")
+
     ax.bar(mensajes_totales.index, mensajes_totales.values, color=COLOR_TOTALES)
 
+    guardar_grafica(fig, "mensajes_hora.png", directorio)
+
+
+def configurar_ejes_grafica_mensajes_hora(ax):
+    """ Se rotan las etiquetas de los ejes para que no se solapen. """
     for label in ax.get_xticklabels():
         label.set(rotation=30, horizontalalignment='right')
-
-    guardar_grafica(fig, "mensajes_hora.png", directorio)
 
 
 def generar_grafica_mensajes_minuto(series_tiempo, directorio):
@@ -234,27 +282,43 @@ def generar_grafica_mensajes_minuto(series_tiempo, directorio):
 
     emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig, ax = configuracion_inicial_figura(
-        (12, 4), f"Mensajes por minuto del día: {emisor_1} y {emisor_2}")
+    titulo = f"Mensajes por minuto del día: {emisor_1} y {emisor_2}"
 
+    fig, ax = configuracion_inicial_figura((12, 4), titulo)
+
+    configurar_ejes_grafica_mensajes_minuto(ax)
+
+    # Configuración adicional de la figura
     fig.subplots_adjust(right=0.99, left=0.05, bottom=0.125)
+    # Se ajusta el escalado para que no se muestren valores fuera de los
+    # límites, ya que los minutos de un día están acotados (00:00 - 23:59)
     ax.autoscale(enable=True, axis='x', tight=True)
 
-    # Generar las barras
     mensajes_totales = series_tiempo[emisor_1]["mensajes_por_minuto"].add(
         series_tiempo[emisor_2]["mensajes_por_minuto"], fill_value=0)
+
     mensajes_totales.index = pd.to_datetime(
         mensajes_totales.index, format="%H:%M:%S")
+
     ax.plot(mensajes_totales, color=COLOR_TOTALES)
 
+    guardar_grafica(fig, "mensajes_minuto.png", directorio)
+
+
+def configurar_ejes_grafica_mensajes_minuto(ax):
+    """ Configura los ejes de la gráfica de mensajes por minuto. Se marcan en
+        grande las horas y en pequeño las medias horas. También se rotan las
+        etiquetas de las horas para evitar que se solapen.
+    """
+
     ax.xaxis.set_major_locator(mdates.HourLocator())
+
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=(0, 30)))
+
+    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=(30)))
 
     for label in ax.get_xticklabels(which='major'):
         label.set(rotation=30, horizontalalignment='right')
-
-    guardar_grafica(fig, "mensajes_minuto.png", directorio)
 
 
 def generar_grafica_tf_idf(tf_idf, directorio, num_por_emisor=5):
