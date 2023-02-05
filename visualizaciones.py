@@ -49,9 +49,26 @@ def guardar_grafica(fig, nombre_archivo, directorio, dpi=150):
     fig.savefig(archivo, dpi=dpi)
     plt.close(fig)
 
+def configurar_grafica(tamaño, titulo, filas=1, columnas=1, color_fondo=COLOR_FONDO):
+    fig, ax = plt.subplots(nrows=filas, ncols=columnas, figsize=tamaño)
+    fig.suptitle(titulo)
+    fig.set_facecolor(color_fondo)
+
+    if filas == 1 and columnas == 1:
+        ax.set_facecolor(color_fondo)
+    else:
+        for a in ax:
+            a.set_facecolor(color_fondo)
+    
+    return fig, ax
+
 def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     """ Se genera una gráfica que representa, para cada valor del que se ha hecho recuento,
     la proporción del valor asociada a cada emisor."""
+
+    emisor_1, emisor_2 = recuentos_mensajes.keys()
+
+    fig, axs = configurar_grafica((6,7), f"Recuentos: {emisor_1} y {emisor_2}", filas=8)    
 
     # Generar los subgráficos para las 8 barras
     fig, axs = plt.subplots(8, 1, figsize=(6, 7))
@@ -59,10 +76,6 @@ def generar_grafica_recuentos_mensajes(recuentos_mensajes, directorio):
     # Incrementar el espacio entre los subgráficos
     fig.subplots_adjust(hspace=2)
 
-    fig.set_facecolor(COLOR_FONDO)
-
-    emisor_1, emisor_2 = recuentos_mensajes.keys()
-    fig.suptitle(f"Recuentos: {emisor_1} y {emisor_2}")
 
     titulos = ["Mensajes", "Imágenes", "Vídeos", "Stickers", "Notas de voz",
                "Duración de notas de voz", "Notas de vídeo", "Duración de notas de vídeo"]
@@ -104,18 +117,13 @@ def generar_subplot_barras_horizontales(ax, recuentos_mensajes, atributo):
 
 def generar_grafica_mensajes_dia_semana(series_tiempo, directorio):
     """ Genera un gráfico de barras con el número de mensajes enviados en cada día de la semana. """
-    fig, ax = plt.subplots(figsize=(6, 3))
-
-    fig.set_facecolor(COLOR_FONDO)
-    ax.set_facecolor(COLOR_FONDO)
 
     emisor_1, emisor_2 = series_tiempo.keys()
-    ax.set_title(f"Mensajes por día de la semana: {emisor_1} y {emisor_2}")
+
+    fig, ax = configurar_grafica((6, 3), f"Mensajes por día de la semana: {emisor_1} y {emisor_2}")
 
     # Ocultar los ejes
     ax.spines[:].set_visible(False)
-
-    emisor_1, emisor_2 = series_tiempo.keys()
 
     # Generar las barras
     dias_semana = ["Lunes", "Martes", "Miércoles",
@@ -132,14 +140,8 @@ def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
     """ Genera un gráfico con una línea marcando el número de mensajes total
         enviados por ambos emisores de media los últimos numero_dias días.
     """
-    fig, ax = plt.subplots(figsize=(9, 4))
-
-    fig.set_facecolor(COLOR_FONDO)
-    ax.set_facecolor(COLOR_FONDO)
-
     emisor_1, emisor_2 = series_tiempo.keys()
-    ax.set_title(
-        f"Mensajes por día (media {numero_dias} días): {emisor_1} y {emisor_2}")
+    fig, ax = configurar_grafica((9, 4), f"Mensajes por día (media {numero_dias} días): {emisor_1} y {emisor_2}")
 
     mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia"].add(
         series_tiempo[emisor_2]["mensajes_por_dia"], fill_value=0)
@@ -157,15 +159,9 @@ def generar_grafica_mensajes_dia(series_tiempo, directorio, numero_dias=7):
 
 def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
     """Genera un gráfico con una línea marcando el número de mensajes total en un día del año."""
-    fig, ax = plt.subplots(figsize=(9, 4))
-
-    fig.set_facecolor(COLOR_FONDO)
-    ax.set_facecolor(COLOR_FONDO)
-
-    # fig.subplots_adjust(bottom=0.23)
-
     emisor_1, emisor_2 = series_tiempo.keys()
-    ax.set_title(f"Mensajes por día del año: {emisor_1} y {emisor_2}")
+
+    fig, ax = configurar_grafica((9, 4), f"Mensajes por día del año: {emisor_1} y {emisor_2}")
 
     mensajes_totales = series_tiempo[emisor_1]["mensajes_por_dia_año"].add(
         series_tiempo[emisor_2]["mensajes_por_dia_año"], fill_value=0)
@@ -183,15 +179,12 @@ def generar_grafica_mensajes_dia_año(series_tiempo, directorio):
 
 def generar_grafica_mensajes_hora(series_tiempo, directorio):
     """ Genera un gráfico de barras con el número de mensajes enviados en cada hora del día. """
-    fig, ax = plt.subplots(figsize=(10, 4))
+    
+    emisor_1, emisor_2 = series_tiempo.keys()
 
-    fig.set_facecolor(COLOR_FONDO)
-    ax.set_facecolor(COLOR_FONDO)
+    fig, ax = configurar_grafica((10, 4), f"Mensajes por hora del día: {emisor_1} y {emisor_2}")
 
     fig.subplots_adjust(right=1, left=0.08, bottom=0.125)
-
-    emisor_1, emisor_2 = series_tiempo.keys()
-    ax.set_title(f"Mensajes por hora del día: {emisor_1} y {emisor_2}")
 
     # Ocultar los ejes
     ax.spines[:].set_visible(False)
@@ -211,13 +204,10 @@ def generar_grafica_mensajes_hora(series_tiempo, directorio):
 
 def generar_grafica_mensajes_minuto(series_tiempo, directorio):
     """ Genera una línea con el número de mensajes enviados en cada minuto del día. """
-    fig, ax = plt.subplots(figsize=(12, 4))
-
-    fig.set_facecolor(COLOR_FONDO)
-    ax.set_facecolor(COLOR_FONDO)
 
     emisor_1, emisor_2 = series_tiempo.keys()
-    ax.set_title(f"Mensajes por minuto del día: {emisor_1} y {emisor_2}")
+    
+    fig, ax = configurar_grafica((12, 4), f"Mensajes por minuto del día: {emisor_1} y {emisor_2}")
 
     fig.subplots_adjust(right=0.99, left=0.05, bottom=0.125)
     ax.autoscale(enable=True, axis='x', tight=True)
