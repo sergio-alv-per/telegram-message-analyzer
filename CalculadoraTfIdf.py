@@ -75,6 +75,8 @@ class CalculadoraTfIdf():
         df_tf_idf["Diferencia"] = df_tf_idf.iloc[:, 1] - df_tf_idf.iloc[:, 0]
         df_tf_idf = self.normalizar_columna_menos_uno_uno(df_tf_idf, "Diferencia")
 
+        return df_tf_idf
+
     def analisis_tf_idf_palabras(self):
         for emisor in self.frecuencia_palabras:
             for palabra in self.todas_palabras:
